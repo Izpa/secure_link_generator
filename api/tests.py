@@ -13,6 +13,8 @@ class IndexTestCase(unittest.TestCase):
             '/?t=1516741096&u=aHR0cDovL3N0YWNrb3ZlcmZsb3cuY29tL3NlYXJjaD9xPXF1ZXN0aW9u=&ip=127.0.0.1&p=password',
             content_type='html/text')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data,
+                         b'http://stackoverflow.com/search?q=question&md5=560e6b3ade697e2fd86b657ad3ade7de')
 
     def test_t_param_is_required(self):
         response = self.test_client.get(
