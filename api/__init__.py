@@ -1,6 +1,38 @@
-from flask import Flask, request
+import base64
+import json
+
+from flask import Flask, request, Response
 
 from instance.settings import app_config
+from shared.response_object import ResponseFailure, ResponseSuccess
+from use_cases.generate_secure_link_use_cases import GenerateSecureLinkUseCase
+from use_cases.request_objects import GenerateSecureLinkRequestObject
+
+STATUS_CODES = {
+    ResponseSuccess.SUCCESS: 200,
+    ResponseFailure.RESOURCE_ERROR: 404,
+    ResponseFailure.PARAMETERS_ERROR: 400,
+    ResponseFailure.SYSTEM_ERROR: 500
+}
+
+
+def _create_request_object_from_request_args(request_args: dict):
+    expires = request_args.get('t')
+    if expires:
+        try:
+            expires = int(expires)
+        except ValueError:
+            pass
+    url = request_args.get('u')
+    if url:
+        url = base64.b64decode(url).decode('utf-8')
+    params = {
+        'expires': expires,
+        'url': url,
+        'ip_address': request_args.get('ip'),
+        'password': request_args.get('p')
+    }
+    return GenerateSecureLinkRequestObject(**params)
 
 
 def create_app(config_name):
@@ -10,10 +42,11 @@ def create_app(config_name):
 
     @app.route('/')
     def index():
-        t = request.args.get('t')
-        u = request.args.get('u')
-        ip = request.args.get('ip')
-        p = request.args.get('p')
-        return str(t)
+        request_object = _create_request_object_from_request_args(request.args)
+        use_case = GenerateSecureLinkUseCase()
+        response = use_case.execute(request_object)
+        return Response(json.dumps(response.value),
+                        mimetype='application/json',
+                        status=STATUS_CODES[response.type])
 
     return app
