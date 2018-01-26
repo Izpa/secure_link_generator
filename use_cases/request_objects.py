@@ -14,8 +14,10 @@ class GenerateSecureLinkRequestObject(ValidRequestObject):
 
         if not (isinstance(expires, int) and expires >= 0):
             invalid_request.add_error('expires', 'Is not correct timestamp (positive integer)')
-        elif expires < datetime.now().timestamp():
-            invalid_request.add_error('expires', 'Is expired timestamp')
+        # В задании ничего не сказано про то, как в дальнейшем планируется использовать сгенерированные ссылки,
+        # поэтому не понятно, нужна ди проверка на срок валидности
+        # elif expires < datetime.now().timestamp():
+        #     invalid_request.add_error('expires', 'Is expired timestamp')
         else:
             instance.expires = expires
 

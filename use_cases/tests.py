@@ -39,14 +39,16 @@ class BuildGenerateSecureLinkRequestObjectTestCase(TestCase):
         self.assertFalse(request_object)
         self.assertEqual(request_object.errors[0]['parameter'], 'expires')
 
-    def test_expires_param_must_be_not_expired_timestamp(self):
-        self.correct_params_dict['expires'] = 1
-
-        request_object = GenerateSecureLinkRequestObject(**self.correct_params_dict)
-
-        self.assertTrue(request_object.has_errors())
-        self.assertFalse(request_object)
-        self.assertEqual(request_object.errors[0]['parameter'], 'expires')
+    # В задании ничего не сказано про то, как в дальнейшем планируется использовать сгенерированные ссылки,
+    # поэтому не понятно, нужна ди проверка на срок валидности
+    # def test_expires_param_must_be_not_expired_timestamp(self):
+    #     self.correct_params_dict['expires'] = 1
+    #
+    #     request_object = GenerateSecureLinkRequestObject(**self.correct_params_dict)
+    #
+    #     self.assertTrue(request_object.has_errors())
+    #     self.assertFalse(request_object)
+    #     self.assertEqual(request_object.errors[0]['parameter'], 'expires')
 
     def test_url_param_is_required(self):
         self.correct_params_dict.pop('url')
