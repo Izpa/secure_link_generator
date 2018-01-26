@@ -16,6 +16,10 @@ class IndexTestCase(unittest.TestCase):
         self.assertEqual(response.data,
                          b'/s/link?md5=FbRZ_kL2P7SJMI6hCxS11Q&expires=2147483647')
 
+    def test_without_params(self):
+        response = self.test_client.get('/', content_type='html/text')
+        self.assertEqual(response.status_code, 400)
+
     def test_t_param_is_required(self):
         response = self.test_client.get(
             '/?u=aHR0cDovL3N0YWNrb3ZlcmZsb3cuY29tL3NlYXJjaD9xPXF1ZXN0aW9u=&ip=127.0.0.1&p=password',

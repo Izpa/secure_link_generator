@@ -1,4 +1,5 @@
 import base64
+import json
 
 from flask import Flask, request, Response
 
@@ -44,6 +45,6 @@ def create_app(config_name):
         request_object = _create_request_object_from_request_args(request.args)
         use_case = GenerateSecureLinkUseCase()
         response = use_case.execute(request_object)
-        return Response(response.value, status=STATUS_CODES[response.type])
+        return Response(json.dumps(response.value).strip('"'), status=STATUS_CODES[response.type])
 
     return app
