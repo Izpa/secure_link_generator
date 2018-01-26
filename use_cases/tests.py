@@ -8,8 +8,8 @@ from use_cases.generate_secure_link_use_cases import GenerateSecureLinkUseCase
 class BuildGenerateSecureLinkRequestObjectTestCase(TestCase):
     def setUp(self):
         self.correct_params_dict = {
-            'expires': 1516741096,
-            'url': 'https://qwerty.ru/',
+            'expires': 2147483647,
+            'url': '/s/link',
             'ip_address': '127.0.0.1',
             'password': 'password'
         }
@@ -49,7 +49,7 @@ class BuildGenerateSecureLinkRequestObjectTestCase(TestCase):
         self.assertEqual(request_object.errors[0]['parameter'], 'url')
 
     def test_url_param_must_be_correct_url(self):
-        self.correct_params_dict['url'] = 'qwerty'
+        self.correct_params_dict['url'] = '//dfds'
 
         request_object = GenerateSecureLinkRequestObject(**self.correct_params_dict)
 
@@ -88,24 +88,24 @@ class BuildGenerateSecureLinkRequestObjectTestCase(TestCase):
 class GenerateSecureLinkUseCaseTestCase(TestCase):
     def setUp(self):
         self.secure_link_use_case = GenerateSecureLinkUseCase()
-        self.url = 'http://stackoverflow.com/search?q=question'
+        self.url = '/s/link'
         self.correct_params_dict = {
-            'expires': 1516741096,
+            'expires': 2147483647,
             'url': self.url,
             'ip_address': '127.0.0.1',
             'password': 'password'
         }
-        self.correct_md5 = '560e6b3ade697e2fd86b657ad3ade7de'
+        self.correct_hash_string = 'FbRZ_kL2P7SJMI6hCxS11Q'
 
-    def test_generate_md5_to_secure_link(self):
-        md5 = GenerateSecureLinkUseCase._generate_md5_to_secure_link(**self.correct_params_dict)
+    def test_generate_hash_to_secure_link(self):
+        hash_string = GenerateSecureLinkUseCase._generate_hash_for_secure_link(**self.correct_params_dict)
 
-        self.assertEqual(md5, self.correct_md5)
+        self.assertEqual(hash_string, self.correct_hash_string)
 
     def test_add_query_to_url(self):
         query_dict = {'lang': 'en', 'tag': 'python'}
 
-        correct_url_with_new_query = 'http://stackoverflow.com/search?q=question&lang=en&tag=python'
+        correct_url_with_new_query = '/s/link?lang=en&tag=python'
         parsed_correct_url_with_new_query = urlparse(correct_url_with_new_query)
         correct_url_with_new_query_query_dict = dict(parse_qsl(parsed_correct_url_with_new_query.query))
 
@@ -120,9 +120,9 @@ class GenerateSecureLinkUseCaseTestCase(TestCase):
         self.assertEqual(parsed_url_with_new_query.fragment, parsed_correct_url_with_new_query.fragment)
         self.assertDictEqual(correct_url_with_new_query_query_dict, url_with_new_query_query_dict)
 
-    def test_remove_query_from_url(self):
-        correct_url_without_query = 'http://stackoverflow.com/search'
-        url_without_query = GenerateSecureLinkUseCase._remove_query_from_url(self.url)
+    def test_get_path_from_url(self):
+        correct_url_without_query = '/s/link'
+        url_without_query = GenerateSecureLinkUseCase._get_path_from_url(self.url)
 
         self.assertEqual(correct_url_without_query, url_without_query)
 
@@ -140,9 +140,20 @@ class GenerateSecureLinkUseCaseTestCase(TestCase):
                           'type': 'PARAMETERS_ERROR'})
 
     def test_process_request_with_correct_request(self):
-        correct_secure_link = 'http://stackoverflow.com/search?q=question&md5=560e6b3ade697e2fd86b657ad3ade7de'
+        correct_secure_link = '/s/link?md5=FbRZ_kL2P7SJMI6hCxS11Q&expires=2147483647'
+        parsed_correct_secure_link = urlparse(correct_secure_link)
+        correct_secure_link_query_dict = dict(parse_qsl(parsed_correct_secure_link.query))
+        
         request_object = GenerateSecureLinkRequestObject(**self.correct_params_dict)
         response_object = self.secure_link_use_case.execute(request_object)
+        secure_link = response_object.value
+        parsed_secure_link = urlparse(secure_link)
+        secure_link_query_dict = dict(parse_qsl(parsed_secure_link.query))
 
         self.assertTrue(bool(response_object))
-        self.assertEqual(response_object.value, correct_secure_link)
+        self.assertEqual(parsed_correct_secure_link.scheme, parsed_secure_link.scheme)
+        self.assertEqual(parsed_correct_secure_link.netloc, parsed_secure_link.netloc)
+        self.assertEqual(parsed_correct_secure_link.path, parsed_secure_link.path)
+        self.assertEqual(parsed_correct_secure_link.params, parsed_secure_link.params)
+        self.assertEqual(parsed_correct_secure_link.fragment, parsed_secure_link.fragment)
+        self.assertDictEqual(correct_secure_link_query_dict, secure_link_query_dict)

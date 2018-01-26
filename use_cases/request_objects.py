@@ -4,7 +4,7 @@ from shared.request_object import ValidRequestObject, InvalidRequestObject
 
 
 class GenerateSecureLinkRequestObject(ValidRequestObject):
-    url_pattern = re.compile("^(?:http(s)?://)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$")
+    url_pattern = re.compile("^((?:http|ftp)s?://)?[\w.-]?(?:.[\w\.-]+)+[\w\-._:/?#[\]@!$&'()*+,;=]+$")
     ip_address_pattern = re.compile('^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$')
 
     def __new__(cls, expires: int=None, url: str=None, ip_address: str=None, password: str=None):

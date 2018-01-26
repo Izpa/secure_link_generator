@@ -10,11 +10,11 @@ class IndexTestCase(unittest.TestCase):
 
     def test_with_all_correct_params(self):
         response = self.test_client.get(
-            '/?t=1516741096&u=aHR0cDovL3N0YWNrb3ZlcmZsb3cuY29tL3NlYXJjaD9xPXF1ZXN0aW9u=&ip=127.0.0.1&p=password',
+            '/?t=2147483647&u=L3MvbGluaw==&ip=127.0.0.1&p=password',
             content_type='html/text')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data,
-                         b'http://stackoverflow.com/search?q=question&md5=560e6b3ade697e2fd86b657ad3ade7de')
+                         b'/s/link?md5=FbRZ_kL2P7SJMI6hCxS11Q&expires=2147483647')
 
     def test_t_param_is_required(self):
         response = self.test_client.get(
@@ -56,16 +56,16 @@ class IndexTestCase(unittest.TestCase):
 class CreateRequestObjectFromRequestArgsTestCase(unittest.TestCase):
     def setUp(self):
         self.request_args = {
-            't': '1516741096',
-            'u': 'aHR0cDovL3N0YWNrb3ZlcmZsb3cuY29tL3NlYXJjaD9xPXF1ZXN0aW9u',
+            't': '2147483647',
+            'u': 'L3MvbGluaw==',
             'ip': '127.0.0.1',
             'p': 'password',
         }
 
     def test_with_all_correct_params(self):
         request_object = _create_request_object_from_request_args(self.request_args)
-        self.assertEqual(1516741096, request_object.expires)
-        self.assertEqual('http://stackoverflow.com/search?q=question', request_object.url)
+        self.assertEqual(2147483647, request_object.expires)
+        self.assertEqual('/s/link', request_object.url)
         self.assertEqual('127.0.0.1', request_object.ip_address)
         self.assertEqual('password', request_object.password)
 
