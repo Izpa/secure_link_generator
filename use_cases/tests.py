@@ -39,6 +39,15 @@ class BuildGenerateSecureLinkRequestObjectTestCase(TestCase):
         self.assertFalse(request_object)
         self.assertEqual(request_object.errors[0]['parameter'], 'expires')
 
+    def test_expires_param_must_be_not_expired_timestamp(self):
+        self.correct_params_dict['expires'] = 1
+
+        request_object = GenerateSecureLinkRequestObject(**self.correct_params_dict)
+
+        self.assertTrue(request_object.has_errors())
+        self.assertFalse(request_object)
+        self.assertEqual(request_object.errors[0]['parameter'], 'expires')
+
     def test_url_param_is_required(self):
         self.correct_params_dict.pop('url')
 
@@ -134,7 +143,7 @@ class GenerateSecureLinkUseCaseTestCase(TestCase):
         self.assertFalse(bool(response_object))
         self.assertEqual(response_object.value,
                          {'message': 'expires: Is not correct timestamp (positive integer)\n'
-                                     'url: Is not correct url\n'
+                                     'url: Is not correct url or path\n'
                                      'ip_address: Is not correct ip-address\n'
                                      'password: Is not string',
                           'type': 'PARAMETERS_ERROR'})
