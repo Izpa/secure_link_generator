@@ -8,6 +8,13 @@ Python 3.6
 Flask 0.12.2
 
 ## Download
+https://github.com/Izpa/secure_link_generator/archive/develop.zip
+
+or
+
+```
+git clone git@github.com:Izpa/secure_link_generator.git
+```
 
 ## Installation
 In virtualenv run
