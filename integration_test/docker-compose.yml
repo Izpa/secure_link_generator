@@ -6,6 +6,7 @@ web:
   environment:
     - SECRET=2394utrjfdg920844258hgj9485hglkdmv
     - APP_SETTINGS=production
+    - FLASK_APP=run.py
 
 nginx:
   image: nginx
